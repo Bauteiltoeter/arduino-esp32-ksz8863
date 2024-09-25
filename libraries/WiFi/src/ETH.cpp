@@ -25,6 +25,7 @@
 #include "eth_phy/phy_ip101.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "ETH_ksz8863.h"
 
 extern void tcpipInit();
 
@@ -41,6 +42,18 @@ static void _eth_phy_config_gpio(void)
     }
     phy_rmii_configure_data_interface_pins();
     phy_rmii_smi_configure_pins(_eth_phy_mdc_pin, _eth_phy_mdio_pin);
+}
+
+static void _eth_phy_config_gpio_ksz8863(void)
+{
+    if(_eth_phy_mdc_pin < 0 || _eth_phy_mdio_pin < 0){
+        log_e("SDA and SCL pins are not configured!");
+        return;
+    }
+
+    phy_rmii_configure_data_interface_pins();
+
+    ksz8863_gpio_init(_eth_phy_mdc_pin, _eth_phy_mdio_pin);
 }
 
 static void _eth_phy_power_enable(bool enable)
@@ -82,6 +95,21 @@ bool ETHClass::begin(uint8_t phy_addr, int power, int mdc, int mdio, eth_phy_typ
     } else if(type == ETH_PHY_IP101) {
       eth_config_t config = phy_ip101_default_ethernet_config;
       memcpy(&eth_config, &config, sizeof(eth_config_t));
+    } else if(type == ETH_PHY_KSZ8863) {
+        eth_config.phy_addr = PHY0;
+        eth_config.mac_mode = ETH_MODE_RMII;
+        eth_config.clock_mode = ETH_CLOCK_GPIO0_IN;
+        eth_config.phy_init = ksz_phy_init;
+        eth_config.phy_check_link = ksz8863_phy_check_link;
+        eth_config.phy_check_init = ksz8863_phy_check_init;
+        eth_config.phy_get_speed_mode = ksz8863_phy_get_speed_mode;
+        eth_config.phy_get_duplex_mode = ksz8863_phy_get_duplex_mode;
+        eth_config.gpio_config = _eth_phy_config_gpio_ksz8863;
+        eth_config.flow_ctrl_enable = false;
+        eth_config.phy_get_partner_pause_enable = ksz_phy_get_partner_pause_enable;
+        eth_config.phy_power_enable = ksz_phy_power_enable;
+        eth_config.reset_timeout_ms = 1000;
+        eth_config.promiscuous_enable = false;
     } else {
         log_e("Bad ETH_PHY type: %u", (uint8_t)type);
         return false;
@@ -89,7 +117,10 @@ bool ETHClass::begin(uint8_t phy_addr, int power, int mdc, int mdio, eth_phy_typ
 
     eth_config.phy_addr = (eth_phy_base_t)phy_addr;
     eth_config.clock_mode = clock_mode;
-    eth_config.gpio_config = _eth_phy_config_gpio;
+    if(type == ETH_PHY_KSZ8863)
+        eth_config.gpio_config = _eth_phy_config_gpio_ksz8863;
+    else
+        eth_config.gpio_config = _eth_phy_config_gpio;
     eth_config.tcpip_input = tcpip_adapter_eth_input;
     if(_eth_phy_power_pin >= 0){
         _eth_phy_power_enable_orig = eth_config.phy_power_enable;

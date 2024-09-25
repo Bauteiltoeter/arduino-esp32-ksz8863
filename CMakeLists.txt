@@ -68,6 +68,7 @@ set(LIBRARY_SRCS
   libraries/WiFiClientSecure/src/ssl_client.cpp
   libraries/WiFiClientSecure/src/WiFiClientSecure.cpp
   libraries/WiFi/src/ETH.cpp
+  libraries/WiFi/src/ETH_ksz8863.cpp
   libraries/WiFi/src/WiFiAP.cpp
   libraries/WiFi/src/WiFiClient.cpp
   libraries/WiFi/src/WiFi.cpp

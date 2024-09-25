@@ -1,3 +1,10 @@
+# What's changed
+
+This is a Fork from v1.0.6.4 hosted by Aircookie (WLED).
+This fork adds support for the KSZ8863 Ethernet Phy with integrated three-port switch.
+
+This driver uses Wire.h / I2C for communication with the Phy!
+
 # Arduino core for the ESP32
 [![Build Status](https://travis-ci.org/espressif/arduino-esp32.svg?branch=master)](https://travis-ci.org/espressif/arduino-esp32) ![](https://github.com/espressif/arduino-esp32/workflows/ESP32%20Arduino%20CI/badge.svg)
 
