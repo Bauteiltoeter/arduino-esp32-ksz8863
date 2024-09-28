@@ -186,7 +186,7 @@ esp_err_t ksz_phy_init(void)
 
 
     //External clock
-    ksz_write_reg(198,0x01)
+    ksz_write_reg(198,0x01);
 
 
 
