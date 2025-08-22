@@ -3,6 +3,7 @@
 #include "driver/gpio.h"
 #include "driver/periph_ctrl.h"
 #include <Wire.h>
+#include <mutex>
 
 #define KSZ8863_ADR 0b1011111
 //use register / bit definitions
@@ -16,8 +17,7 @@
 #define KSZ_BIT_DUPLEX 1
 
 
-
-
+static std::mutex i2c_mutex;
 
 void ksz8863_gpio_init(int scl, int sda)
 {
@@ -27,7 +27,7 @@ void ksz8863_gpio_init(int scl, int sda)
 //I2C Access functions
 static uint8_t ksz8863_read_reg(uint8_t reg)
 {
-
+    std::lock_guard<std::mutex> lock(i2c_mutex);
     Wire.beginTransmission(KSZ8863_ADR);
     Wire.write(reg); //register
     Wire.endTransmission();
@@ -39,6 +39,7 @@ static uint8_t ksz8863_read_reg(uint8_t reg)
 
 static void ksz_write_reg(uint8_t reg, uint8_t value)
 {
+    std::lock_guard<std::mutex> lock(i2c_mutex);
     Wire.beginTransmission(KSZ8863_ADR);
     Wire.write(reg);
     Wire.write(value);
