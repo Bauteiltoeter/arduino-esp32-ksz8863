@@ -32,28 +32,12 @@ static bool ksz8863_read_reg(uint8_t reg, uint8_t* data)
     Wire.beginTransmission(KSZ8863_ADR);
     int writtenBytes = Wire.write(reg); //register
 
-    if (writtenBytes != 1)
-    {
-    	return false;
-        Wire.endTransmission();
-    }
+    Wire.endTransmission(false);
 
-    int error = Wire.endTransmission(false);
+   
 
-    if ( error != 0)
-    {
-        Wire.endTransmission();
-        return false;
-    }
-
-    int readBytes = Wire.requestFrom(KSZ8863_ADR,1);
+    Wire.requestFrom(KSZ8863_ADR,1);
     
-
-    if ( readBytes != 1)
-    {
-        return false;
-        Wire.endTransmission();
-    }
 
     *data  = Wire.read();
 
