@@ -36,13 +36,18 @@ static bool ksz8863_read_reg(uint8_t reg, uint8_t* data)
 
    
 
-    Wire.requestFrom(KSZ8863_ADR,1);
+    int ret = Wire.requestFrom(KSZ8863_ADR,1);
     
 
     *data  = Wire.read();
-
-    Wire.endTransmission();
     
+    if ( ret != 1)
+    {
+      Serial.printf("Read error: %d\n", ret);
+      *data = 0;
+      return false;
+    }
+  
 
     return true;
 }
@@ -93,14 +98,14 @@ bool ksz8863_phy_check_link(void)
     }
 
 
-    if(linkOk)
-    {
-       // Serial.printf("Ports link ok\n");
-    }
-    else
-    {
-        Serial.printf("ports link bad\n");
-    }
+    //if(linkOk)
+    //{
+    //   Serial.printf("Ports link ok\n");
+    //}
+    //else
+    //{
+    //    Serial.printf("ports link bad\n");
+    //}
 
     lastLinkOk = linkOk;
     return linkOk;
